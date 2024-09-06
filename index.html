@@ -3,12 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Basic HTML and JavaScript</title>
+    <title>Fetch Methods</title>
     <script src="script.js" defer></script>
 </head>
 <body>
+    <label>Url</label>
+    <input type="text" id ="urlInput">
+    <br>
     <label>Duration in seconds</label>
-    <input type="text" id = "input">
+    <input type="text" id ="durationInput">
+    <br>
+    <label>Method: </label>
+    <select id="methodInput">
+        <option value="get">GET</option>
+        <option value="post">POST</option>
+        <option value="put">PUT</option>
+        <option value="patch">PATCH</option>
+        <option value="delete">DELETE</option>
+        <option value="head">HEAD</option>
+      </select>
+    <br>
+    <label>Body: </label>
+    <input type="text" id ="bodyInput">
+    <br>
+    <label>Headers: </label>
+    <input type="text" id ="headersInput">
+    <br>
     <button id="button">Fetch</button>
 
     <p id="output"></p>

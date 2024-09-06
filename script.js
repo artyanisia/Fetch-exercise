@@ -1,48 +1,84 @@
 window.addEventListener("load", (event) => {
-    
+
+    const urlInput = document.getElementById('urlInput');
+    const durationInput = document.getElementById("durationInput");
+    const methodInput = document.getElementById("methodInput");
+    const bodyInput = document.getElementById("bodyInput");
+    const headersInput = document.getElementById("headersInput");
     const feedbackOutput = document.getElementById("feedbackOutput");
     const output = document.getElementById("output");
-    const durationInput = document.getElementById("input");
     const button = document.getElementById('button');
 
-    button.addEventListener('click', function (){
-        const controller = new AbortController();
-        const url = "https://jsonplaceholder.typicode.com/posts/1";
     
+    button.addEventListener('click', function (){
+
+        output.textContent = "";
+        const url = urlInput.value;
         let duration = Number(durationInput.value);
+        const method = methodInput.value;
+        const body = bodyInput.value;
+
+        const controller = new AbortController();
+    
+        //https://jsonplaceholder.typicode.com/todos
+        //{ "Content-Type": "application/json" }    
+        //{"title": "asdasdasd", "completed": "false"}
+
+        const requestOptions = {
+            method: method,
+            headers: headers,
+            signal: controller.signal
+        };
+    
+        if (method === 'post' || method === 'put' || method === 'patch') {
+            requestOptions.body = body; // Include body only for methods that allow it
+        }
+    
+        const request = new Request(url, requestOptions);
     
         if (isNaN(duration) || duration <= 0) {
     
             duration = 5000; // Default to 5 seconds if input is invalid
             feedbackOutput.textContent = 'Invalid input. Defaulting to 5 seconds.';
             feedbackOutput.textContent = '';
-            fetchApi(controller, url, duration);
-
-    
-        } else {
-            fetchApi(controller,url,duration);
         }
 
-        function fetchApi (controller, url, duration) {
+        fetchApi(request,duration);
 
-            const timeoutId = setTimeout(() => controller.abort(), duration);
-        
-            const response = fetch(url, {
-                method: 'PUT',
-                body: JSON.stringify({
-                    id: 1,
-                    title: 'foo',
-                    body: 'bar',
-                    userId: 1,
-                }),
-                headers: {
-                    'Content-type': 'application/json; charset=UTF-8',
-                },
-            })
-                .then(response => response.json())
-                .then(json => {
-                    //Display the JSON data as a formatted string
-                    output.textContent = JSON.stringify(json, null, 4);
+        function fetchApi (request, duration) {
+
+            const timeoutId = setTimeout(() => controller.abort(), duration)
+            fetch(request)
+                .then(response => {
+                    console.log('Response Status:', response.status); 
+
+                    if (response.status === 204) {
+                        output.textContent = 'Request successful with no content.';
+
+                    } else if (response.status === 200 || response.status === 201) {
+                        if(method === 'head'){
+                            
+                            const headers = {};
+                            response.headers.forEach((value, key) => {
+                                headers[key] = value;
+                            });
+
+                            console.log(headers);
+
+                            output.textContent = 'Status Code: ' + response.status + '\n' +
+                                'Response Headers:\n' +
+                                Object.entries(headers)
+                                    .map(([key, value]) => `${key}: ${value}`)
+                                    .join('\n');
+                        }
+                        else{
+                            return response.json().then(json => {
+                                output.textContent = JSON.stringify(json, null, 4);
+                            });
+                        }
+                    } else {
+                        output.textContent = `Unexpected status code: ${response.status}`;
+                    }
                 })
                 .catch((err) => {
                     if (err.name === 'AbortError') {
@@ -53,9 +89,8 @@ window.addEventListener("load", (event) => {
                     console.error('Fetch error:', err);
                 })
                 .finally(() => {
-                clearTimeout(timeoutId);
+                    clearTimeout(timeoutId);
                 });
-            
         }
     })
 })
