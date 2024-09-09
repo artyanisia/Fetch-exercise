@@ -1,0 +1,96 @@
+body{
+    background-color: antiquewhite;
+    max-width: 900px;
+    margin: 40px auto;
+}
+
+table {
+    width: 90%;
+    margin: 0 5%;
+    text-align: left;
+    border: 1px solid #ddd; 
+    border-radius: 8px; 
+    overflow: hidden; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+    table-layout: fixed; 
+}
+
+tbody tr:hover {
+    background-color: #e0e0e0; 
+}
+
+th, td {
+    padding: 0.5em;
+}
+
+th {
+    border: 1px solid black;
+    background-color: #f4a460; 
+    color: #ffffff; 
+    font-weight: bold;
+    text-align: left;
+}
+
+td {
+    background-color: rgba(255, 255, 255, 0);
+    transition: all 0.2s linear;
+    opacity: 0.6;
+}
+
+tbody tr:nth-child(9n+1),
+tbody tr:nth-child(9n+2),
+tbody tr:nth-child(9n+3) {
+    background-color: #f2f2f2; 
+}
+
+tbody tr:nth-child(9n+4),
+tbody tr:nth-child(9n+5),
+tbody tr:nth-child(9n+6) {
+    background-color: #ffffff; 
+}
+
+tbody tr:nth-child(9n+7),
+tbody tr:nth-child(9n+8),
+tbody tr:nth-child(9n+9) {
+    background-color: #e0e0e0;
+}
+
+tbody tr:hover {
+    background-color: #e0e0e0;
+}
+
+label {
+    display: block;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 8px; /* Space between label and input */
+    display: inline-block;
+}
+
+input {
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px; /* Rounded corners */
+    width: 100%; /* Full width */
+    box-sizing: border-box; /* Include padding and border in width */
+}
+
+button {
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    padding: 10px 20px;
+    border: 1px solid #f4a460;
+    border-radius: 4px;
+    background-color: #f4a460; /* Blue background */
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #bd8825; /* Darker blue on hover */
+    border-color: #bd8825; /* Darker border on hover */
+}

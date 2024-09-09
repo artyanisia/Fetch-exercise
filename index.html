@@ -5,15 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fetch Methods</title>
     <script src="script.js" defer></script>
+    <link rel="stylesheet" href="style.css" >
 </head>
 <body>
-    <label>Url</label>
-    <input type="text" id ="urlInput">
+    <!-- <label>Url</label>
+    <input type="text" id ="urlInput"> -->
+    <div id='wrapper'>
+        <button id="getButton">GET</button>
+        <button id="postButton">POST</button>
+        <button id="putButton">PUT</button>
+        <button id="patchButton">PATCH</button>
+        <button id="deleteButton">DELETE</button>
+        <button id="headButton">HEAD</button>
+        <button id="button">Fetch</button>
+    </div>
     <br>
-    <label>Duration in seconds</label>
+    <label id="durationInputLabel">Duration in seconds</label>
     <input type="text" id ="durationInput">
     <br>
-    <label>Method: </label>
+    <label id="methodInputLabel">Method: </label>
     <select id="methodInput">
         <option value="get">GET</option>
         <option value="post">POST</option>
@@ -23,13 +33,12 @@
         <option value="head">HEAD</option>
       </select>
     <br>
-    <label>Body: </label>
+    <label id="bodyInputLabel">Body: </label>
     <input type="text" id ="bodyInput">
     <br>
-    <label>Headers: </label>
+    <label id="headersInputLabel">Headers: </label>
     <input type="text" id ="headersInput">
     <br>
-    <button id="button">Fetch</button>
 
     <p id="output"></p>
     <p id="feedbackOutput"></p>
