@@ -11,35 +11,24 @@
     <!-- <label>Url</label>
     <input type="text" id ="urlInput"> -->
     <div id='wrapper'>
-        <button id="getButton">GET</button>
-        <button id="postButton">POST</button>
-        <button id="putButton">PUT</button>
-        <button id="patchButton">PATCH</button>
-        <button id="deleteButton">DELETE</button>
-        <button id="headButton">HEAD</button>
-        <button id="button">Fetch</button>
-    </div>
-    <br>
-    <label id="durationInputLabel">Duration in seconds</label>
-    <input type="text" id ="durationInput">
-    <br>
-    <label id="methodInputLabel">Method: </label>
-    <select id="methodInput">
-        <option value="get">GET</option>
-        <option value="post">POST</option>
-        <option value="put">PUT</option>
-        <option value="patch">PATCH</option>
-        <option value="delete">DELETE</option>
-        <option value="head">HEAD</option>
-      </select>
-    <br>
-    <label id="bodyInputLabel">Body: </label>
-    <input type="text" id ="bodyInput">
-    <br>
-    <label id="headersInputLabel">Headers: </label>
-    <input type="text" id ="headersInput">
-    <br>
+        <button id="getTable">Get list from API</button>
+        <button id="createDB">Create indexedDB</button>
+        <button id="showTable">show Table</button>
+        <br>
+        <label for="search">Delete Task</label>
+        <input type="search" id="deleteInput" name="search" placeholder="task's id">
+        <button id="deleteTask">Delete Task</button>
+        <br>
+        <label for="search">Add Task</label>
+        <input type="search" id="addTitle" name="search" placeholder="task's title">
+        <input type="search" id="addUser" name="search" placeholder="task's user">
+        <button id="addTask">Add Task</button>
+        <br>
+        <label for="search">Complete Task</label>
+        <input type="search" id="completeInput" name="search" placeholder="task's id">
+        <button id="completeTask">Complete Task</button>
 
+    </div>
     <p id="output"></p>
     <p id="feedbackOutput"></p>
 </body>
