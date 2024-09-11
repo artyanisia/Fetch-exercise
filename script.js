@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const deleteInput = document.getElementById("deleteInput");
     const addTitle = document.getElementById("addTitle");
     const addUser = document.getElementById("addUser");
+    const addDescription = document.getElementById("addDescription");
     const addTask = document.getElementById("addTask");
     const completeInput = document.getElementById("completeInput");
     const completeTask = document.getElementById("completeTask");
@@ -20,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         output.textContent ='';
 
-        let headers = Object.keys(data[0]);
+        let headers = ['userId', 'id', 'title', 'completed'];
         let table = document.createElement('table');
         let thead = document.createElement('thead');
         let tbody = document.createElement('tbody');
@@ -63,21 +64,54 @@ document.addEventListener('DOMContentLoaded', () => {
             row.appendChild(userIdCell);
     
             let firstItem = userItems[0];
+
             headers.slice(1).forEach(header => {
+
                 let cell = document.createElement('td');
-                cell.textContent = firstItem[header.toLowerCase()];
+
+                if (header.toLowerCase() === 'completed') {
+
+                    let checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.checked = firstItem[header.toLowerCase()] === 1; 
+                    checkbox.addEventListener('change', function() {
+                        let newCompletedValue = this.checked ? 1 : 0;
+                        updateTaskCompletion(firstItem.id, newCompletedValue);
+                    });
+                    cell.appendChild(checkbox);
+
+                } else {
+                    cell.textContent = firstItem[header.toLowerCase()];
+                }
                 row.appendChild(cell);
             });
     
              tbody.appendChild(row);
     
             for (let i = 1; i < rowCount; i++) {
+
                 let item = userItems[i];
                 let row = document.createElement('tr');
     
                 headers.slice(1).forEach(header => {
+
                     let cell = document.createElement('td');
-                    cell.textContent = item[header.toLowerCase()];
+
+                    if (header.toLowerCase() === 'completed') {
+
+                        let checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.checked = item[header.toLowerCase()] === 1; 
+                        checkbox.addEventListener('change', function() {
+                            let newCompletedValue = this.checked ? 1 : 0;
+                            updateTaskCompletion(item.id, newCompletedValue);
+                        });
+                        cell.appendChild(checkbox);
+
+                    }
+                    else {
+                        cell.textContent = item[header.toLowerCase()];
+                    }
                     row.appendChild(cell);
                 });
     
@@ -119,10 +153,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             document.getElementById('output').textContent = '';
                             
                             data = Array.isArray(json) ? json : [json];
-                            
+
                             if (data.length > 0) {
                                 
-                                tableFetched = 1;
+                                tableFetched = true;
 
                             } else {
                                 document.getElementById('output').textContent = 'No data available.';
@@ -154,26 +188,37 @@ document.addEventListener('DOMContentLoaded', () => {
             let request = indexedDB.open("MyDatabase", 1); //opens or creates
 
             request.onupgradeneeded = function(event) {  //if the db needs to be updated or created
+
                 let db = event.target.result;
+
                 if (!db.objectStoreNames.contains("TODO")) {
-                    let objectStore = db.createObjectStore("TODO", { keyPath: "id", autoIncrement: true });
-                    objectStore.createIndex("userId", "userId", { unique: false });
+
+                    let objectStore = db.createObjectStore("TODO", { keyPath: "id", autoIncrement: true }); //autoIncrement generates the key automatically
+
+                    objectStore.createIndex("userId", "userId", { unique: false }); // more objects can be stored with the same value for index path
                     objectStore.createIndex("title", "title", { unique: false });
                     objectStore.createIndex("completed", "completed", { unique: false });
                 }
             };
-        
+            
             request.onsuccess = function(event) {  //when it opens
                 let db = event.target.result;
         
                 let transaction = db.transaction(["TODO"], "readwrite");  //readwrite allow modifications
+                
                 let objectStore = transaction.objectStore("TODO");
 
                 data.forEach(item => {
-                    
-                    let addRequest = objectStore.add(item);
+                    let itemToStore = {
+                        id: item.id,
+                        userId: item.userId,
+                        title: item.title,
+                        completed: item.completed ? 1 : 0  // Convert true to 1 and false to 0
+                    };
+
+                    let addRequest = objectStore.add(itemToStore);
                     addRequest.onsuccess = function() {
-                        //console.log("Data added to IndexedDB:", item);
+                       //console.log("Data added to IndexedDB:", item);
                     };
                     addRequest.onerror = function(event) {
                         console.error("Error adding data to IndexedDB:", event.target.errorCode);
@@ -188,13 +233,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
             }
             request.onerror = function(event) {
-                console.error("Error opening IndexedDB:", event.target.errorCode);
+                console.error("Error opening IndexedDB:", event.target.errorCode?.message);
             };
+        }
+        else{
+            output.textContent = "Fetch the content from API";
         }
     })
 
     function fetchDataFromIndexedDB(callback) {
-        let request = indexedDB.open("MyDatabase", 1);
+
+        let request = indexedDB.open("MyDatabase", 2);
     
         request.onsuccess = function(event) {
             let db = event.target.result;
@@ -205,6 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let getAllRequest = objectStore.getAll(); // Fetch all records
 
             getAllRequest.onsuccess = function(event) {
+                //console.log(event.target.result)
                 callback(event.target.result); // Pass data to the callback
             };
     
@@ -226,10 +276,11 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
     
-    function addNewTask(title,userId) {
-        let request = indexedDB.open("MyDatabase", 1); // Open or create the database
+    function addNewTask(title,description, userId) {
+        let request = indexedDB.open("MyDatabase", 2); // Open or create the database
     
         request.onsuccess = function(event) {
+
             let db = event.target.result;
             
             let transaction = db.transaction(["TODO"], "readwrite"); 
@@ -246,6 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     id: nextId,
                     userId: userId, 
                     title: title,
+                    description: description,
                     completed: false
                 };
     
@@ -253,6 +305,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
                 addRequest.onsuccess = function() {
                     console.log("New task added:", newTask);
+                    console.log("Task's description", newTask.description);
+                    refreshTable();
                 };
     
                 addRequest.onerror = function(event) {
@@ -280,7 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function deleteDataFromIndexedDB(id) {
 
-        let request = indexedDB.open("MyDatabase", 1);
+        let request = indexedDB.open("MyDatabase", 2);
     
         request.onsuccess = function(event) {
 
@@ -288,11 +342,13 @@ document.addEventListener('DOMContentLoaded', () => {
     
             let transaction = db.transaction(["TODO"], "readwrite");
             let objectStore = transaction.objectStore("TODO");
-    
+            
+
             let deleteRequest = objectStore.delete(id);
     
             deleteRequest.onsuccess = function() {
                 console.log(`Record with id ${id} deleted successfully.`);
+                refreshTable();
             };
     
             deleteRequest.onerror = function(event) {
@@ -312,8 +368,9 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Error opening IndexedDB:", event.target.errorCode);
         };
     }
-    function completeTheTask(taskId) {
-        let request = indexedDB.open("MyDatabase", 1);
+
+    function updateTaskCompletion(taskId, newCompletedValue) {
+        let request = indexedDB.open("MyDatabase", 2);
     
         request.onsuccess = function(event) {
             let db = event.target.result;
@@ -322,17 +379,20 @@ document.addEventListener('DOMContentLoaded', () => {
             let objectStore = transaction.objectStore("TODO");
     
             let getRequest = objectStore.get(taskId);
-    
+
             getRequest.onsuccess = function(event) {
+
                 let task = event.target.result;
-    
+
                 if (task) {
-                    task.completed = true;
+
+                    task.completed = newCompletedValue;
     
                     let updateRequest = objectStore.put(task);
     
                     updateRequest.onsuccess = function() {
-                        console.log(`Task with id ${taskId} marked as complete.`);
+                        console.log(`Task with id ${taskId} marked as ${newCompletedValue === 1 ? 'complete' : 'incomplete'}.`);
+                        refreshTable();
                     };
     
                     updateRequest.onerror = function(event) {
@@ -361,99 +421,18 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // function handleTask(action, taskData = {}) {
-    //     let request = indexedDB.open("MyDatabase", 1); 
-    
-    //     request.onsuccess = function(event) {
-    //         let db = event.target.result;
-    //         let transaction = db.transaction(["TODO"], "readwrite");
-    //         let objectStore = transaction.objectStore("TODO");
-    
-    //         switch (action) {
-    //             case 'add':
-    //                 let nextId = taskData.id || Date.now(); 
-    //                 let newTask = {
-    //                     id: nextId,
-    //                     userID: taskData.userID || '1', 
-    //                     title: taskData.title,
-    //                     completed: false
-    //                 };
-    
-    //                 let addRequest = objectStore.add(newTask);
-    //                 addRequest.onsuccess = function() {
-    //                     console.log("Task added to IndexedDB:", newTask);
-    //                 };
-    //                 addRequest.onerror = function(event) {
-    //                     console.error("Error adding task to IndexedDB:", event.target.errorCode);
-    //                 };
-    //                 break;
-    
-    //             case 'complete':
-    //                 let getRequest = objectStore.get(taskData.id);
-    
-    //                 getRequest.onsuccess = function(event) {
-    //                     let task = event.target.result;
-    //                     if (task) {
-    //                         task.completed = true;
-    //                         let updateRequest = objectStore.put(task);
-    //                         updateRequest.onsuccess = function() {
-    //                             console.log(`Task with id ${taskData.id} marked as complete.`);
-    //                         };
-    //                         updateRequest.onerror = function(event) {
-    //                             console.error("Error updating task in IndexedDB:", event.target.errorCode);
-    //                         };
-    //                     } else {
-    //                         console.error(`Task with id ${taskData.id} not found.`);
-    //                     }
-    //                 };
-    //                 getRequest.onerror = function(event) {
-    //                     console.error("Error fetching task from IndexedDB:", event.target.errorCode);
-    //                 };
-    //                 break;
-    
-    //             case 'delete':
-
-    //                 let deleteRequest = objectStore.delete(taskData.id);
-
-    //                 deleteRequest.onsuccess = function() {
-    //                     console.log(`Task with id ${taskData.id} deleted.`);
-    //                 };
-    //                 deleteRequest.onerror = function(event) {
-    //                     console.error("Error deleting task from IndexedDB:", event.target.errorCode);
-    //                 };
-    //                 break;
-    
-    //             default:
-    //                 console.error("Invalid action type. Use 'add', 'complete', or 'delete'.");
-    //         }
-    //         transaction.oncomplete = function() {
-    //             console.log("Transaction complete.");
-    //         };
-    //         transaction.onerror = function(event) {
-    //             console.error("Transaction error:", event.target.errorCode);
-    //         };
-    //     };
-    
-    //     request.onerror = function(event) {
-    //         console.error("Error opening IndexedDB:", event.target.errorCode);
-    //     };
-    // }
-
     function refreshTable() {
         fetchDataFromIndexedDB(createTable); 
     }
 
     deleteTask.addEventListener('click', () => {
-        deleteDataFromIndexedDB(deleteInput.value);
-        refreshTable();
+        deleteDataFromIndexedDB(Number(deleteInput.value));
     })
     addTask.addEventListener('click', () => {
-        addNewTask( addTitle.value,  addUser.value );
-        refreshTable();
+        addNewTask( addTitle.value,  addDescription.value, addUser.value );
     })
     completeTask.addEventListener('click', () => {
-        completeTheTask(completeInput.value);
-        refreshTable();
+        updateTaskCompletion(Number(completeInput.value));
     })
     showTable.addEventListener('click', () => {
         refreshTable();

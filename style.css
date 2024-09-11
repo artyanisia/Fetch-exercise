@@ -56,10 +56,9 @@ tbody tr:hover {
 label {
     display: block;
     font-family: Arial, sans-serif;
-    font-size: 16px;
+    font-size: 20px;
     color: #333;
-    margin-bottom: 8px; /* Space between label and input */
-    display: inline-block;
+    margin-bottom: 8px;
 }
 
 input {
@@ -68,11 +67,12 @@ input {
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px; /* Rounded corners */
-    width: 100%; /* Full width */
+    width: 50%; /* Full width */
     box-sizing: border-box; /* Include padding and border in width */
 }
 
 button {
+    display: block;
     font-family: Arial, sans-serif;
     font-size: 16px;
     padding: 10px 20px;
@@ -82,9 +82,31 @@ button {
     color: white;
     cursor: pointer;
     transition: background-color 0.3s ease, border-color 0.3s ease;
+    margin-bottom: 10px;
 }
 
 button:hover {
     background-color: #bd8825; /* Darker blue on hover */
     border-color: #bd8825; /* Darker border on hover */
+}
+
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    appearance: none;
+    cursor: pointer;
+}
+
+input[type="checkbox"]:checked {
+    background-color: green; 
+    border-color: green;    
+}
+
+input[type="checkbox"]:checked::after {
+    content: '\2713'; /* Unicode checkmark */
+    font-size: 18px;
+    color: white; /* White checkmark for contrast */
+    position: absolute;
+    left: 4px;
+    top: 0px;
 }
