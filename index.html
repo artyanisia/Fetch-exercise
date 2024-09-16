@@ -15,19 +15,36 @@
         <button id="createDB">Create indexedDB</button>
         <button id="showTable">show Table</button>
 
-        <label for="search">Delete Task</label>
-        <input type="search" id="deleteInput" name="search" placeholder="task's id">
         <button id="deleteTask">Delete Task</button>
-
-        <label for="search">Add Task</label>
-        <input type="search" id="addTitle" name="search" placeholder="task's title">
-        <input type="search" id="addUser" name="search" placeholder="task's user">
-        <input type="search" id="addDescription" name="search" placeholder="task's description">
         <button id="addTask">Add Task</button>
 
-        <label for="search">Complete Task</label>
-        <input type="search" id="completeInput" name="search" placeholder="task's id">
-        <button id="completeTask">Complete Task</button>
+        <button id="localStorage">Create local storage</button>
+        
+        <div id="overlay" class="overlay"></div>
+        
+        <div id="addTaskModal" class = "modal">
+            <div class = "modal-content">
+                <span class="close">&times;</span>
+                <h2>Add task</h2>
+                <form id="addTaskForm">
+                    <input type="text" id="addTitle" name="search" placeholder="task's title">
+                    <input type="text" id="addUser" name="search" placeholder="task's user">
+                    <input type="text" id="addDescription" name="search" placeholder="task's description">
+
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+        <div id="deleteTaskModal" class = "modal">
+            <div class = "modal-content">
+                <span class="close">&times;</span>
+                <h2>Delete task</h2>
+                <form id="deleteTaskForm">
+                    <input type="text" id="deleteInput" name="search" placeholder="task's id">
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
 
     </div>
     <p id="output"></p>

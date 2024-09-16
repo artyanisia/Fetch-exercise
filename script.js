@@ -3,15 +3,14 @@ document.addEventListener('DOMContentLoaded', () => {
     //const urlInput = document.getElementById('urlInput');
     const getTable = document.getElementById("getTable");
     const createDB = document.getElementById("createDB");
-    const deleteTask = document.getElementById("deleteTask");
     const showTable = document.getElementById("showTable");
     const deleteInput = document.getElementById("deleteInput");
     const addTitle = document.getElementById("addTitle");
     const addUser = document.getElementById("addUser");
     const addDescription = document.getElementById("addDescription");
-    const addTask = document.getElementById("addTask");
     const completeInput = document.getElementById("completeInput");
     const completeTask = document.getElementById("completeTask");
+    const localStoragebtn = document.getElementById("localStorage");
     let tableFetched = null;
     let data;
 
@@ -80,13 +79,43 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                     cell.appendChild(checkbox);
 
+                } else if (header.toLowerCase() === 'title') {
+                    
+                    let titleWrapper = document.createElement('div');
+                    titleWrapper.className = "dropdown";
+
+                    let titleText = document.createElement('span');
+                    titleText.textContent = firstItem.title; // Task title
+                    titleWrapper.appendChild(titleText);
+
+                    let dropdownButton = document.createElement('button');
+                    dropdownButton.className = 'dropdown-button';
+                    dropdownButton.textContent = '▼'; 
+
+                    let popup = document.createElement('div');
+                    popup.className = 'popup';
+                    popup.textContent = firstItem.description;
+                    
+                    dropdownButton.addEventListener('click', function () {
+                        if (popup.style.display === 'none') {
+                            popup.style.display = 'block'; // Show description
+                            dropdownButton.textContent = '▲'; // Change arrow to up
+                        } else {
+                            popup.style.display = 'none'; // Hide description
+                            dropdownButton.textContent = '▼'; // Change arrow to down
+                        }
+                    });
+            
+                    titleWrapper.appendChild(dropdownButton);
+                    titleWrapper.appendChild(popup);
+                    cell.appendChild(titleWrapper);
                 } else {
                     cell.textContent = firstItem[header.toLowerCase()];
                 }
                 row.appendChild(cell);
             });
     
-             tbody.appendChild(row);
+            tbody.appendChild(row);
     
             for (let i = 1; i < rowCount; i++) {
 
@@ -108,6 +137,37 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
                         cell.appendChild(checkbox);
 
+                    }
+                    else if (header.toLowerCase() === 'title') {
+                        
+                        let titleWrapper = document.createElement('div');
+                        titleWrapper.className = "dropdown";
+
+                        let titleText = document.createElement('span');
+                        titleText.textContent = item.title; // Task title
+                        titleWrapper.appendChild(titleText);            
+
+                        let dropdownButton = document.createElement('button');
+                        dropdownButton.className = 'dropdown-button';
+                        dropdownButton.textContent = '▼'; // Dropdown arrow
+
+                        let popup = document.createElement('div');
+                        popup.className = 'popup';
+                        popup.textContent = item.description;
+                            
+                        dropdownButton.addEventListener('click', function () {
+                            if (popup.style.display === 'none') {
+                                popup.style.display = 'block'; // Show description
+                                dropdownButton.textContent = '▲'; // Change arrow to up
+                            } else {
+                                popup.style.display = 'none'; // Hide description
+                                dropdownButton.textContent = '▼'; // Change arrow to down
+                            }
+                        });
+            
+                        titleWrapper.appendChild(dropdownButton);
+                    titleWrapper.appendChild(popup);
+                    cell.appendChild(titleWrapper);
                     }
                     else {
                         cell.textContent = item[header.toLowerCase()];
@@ -424,18 +484,93 @@ document.addEventListener('DOMContentLoaded', () => {
     function refreshTable() {
         fetchDataFromIndexedDB(createTable); 
     }
+    
+    var addTaskModal = document.getElementById("addTaskModal");
+    var deleteTaskModal = document.getElementById("deleteTaskModal");
+    const addTask = document.getElementById("addTask");
+    const deleteTask = document.getElementById("deleteTask");
+    var closeButtons  = document.getElementsByClassName("close");
+    var overlay = document.getElementById("overlay");
 
-    deleteTask.addEventListener('click', () => {
-        deleteDataFromIndexedDB(Number(deleteInput.value));
-    })
-    addTask.addEventListener('click', () => {
-        addNewTask( addTitle.value,  addDescription.value, addUser.value );
-    })
-    completeTask.addEventListener('click', () => {
-        updateTaskCompletion(Number(completeInput.value));
-    })
+    addTask.onclick = function() {
+        addTaskModal.style.display = "block";
+        overlay.style.display = "block"; 
+    }
+
+    deleteTask.onclick = function() {
+        deleteTaskModal.style.display = "block";
+        overlay.style.display = "block"; 
+    }
+    
+    function closeModal(modal) {
+        modal.style.display = "none";
+        overlay.style.display = "none";
+    }
+
+    for (let i = 0; i < closeButtons.length; i++) {
+        closeButtons[i].onclick = function() {
+            closeModal(addTaskModal);
+            closeModal(deleteTaskModal);
+        }
+    }
+
+    window.onclick = function (event){
+        if(event.target === overlay ){
+            closeModal(addTaskModal);
+            closeModal(deleteTaskModal);
+        }
+    }
+
+    document.getElementById('addTaskForm').addEventListener('submit', function(e) {
+        e.preventDefault(); // Prevent page reload
+
+        var title = document.getElementById('addTitle');
+        var description = document.getElementById('addDescription');
+        var userId = document.getElementById('addUser');
+      
+  
+        addNewTask( title.value,  description.value, userId.value );
+
+        title .value = '';
+        description.value = '';
+        userId.value = '';
+   
+        closeModal(addTaskModal);
+    });
+
+    document.getElementById('deleteTaskForm').addEventListener('submit', function(e) {
+        e.preventDefault(); 
+      
+        var id = document.getElementById('deleteInput').value;
+  
+        deleteDataFromIndexedDB(Number(id));
+        
+        id = '';
+
+        closeModal(deleteTaskModal);
+    });
+
     showTable.addEventListener('click', () => {
         refreshTable();
     });
+
+    localStoragebtn.addEventListener('click', (event) => {
+        if(tableFetched){
+            data.forEach(item => {
+                let itemToStore = {
+                    id: item.id,
+                    userId: item.userId,
+                    title: item.title,
+                    completed: item.completed ? 1 : 0
+                };
+
+                localStorage.setItem(item.id, JSON.stringify(itemToStore))
+            })
+
+            console.log("Data saved to local storage.");
+        } else {
+            output.textContent = "Fetch the content from API";
+        }
+    })
     
 })
